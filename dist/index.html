@@ -1,0 +1,53 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./main.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700;800;900&family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Code+Pro&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <title></title>
+</head>
+
+<body>
+    <div id="desc">
+        <div class="title">Datum</div>
+        <div class="small">
+            <p>東京都の交通事故被害を意味する彫刻</p>
+            <p>Statue meaning victims of traffic accidents in Tokyo.</p>
+        </div>
+
+        <div class="small">
+            <p>交番に掲示されている交通事故被害情報を、作者が見て入力すると更新される。</p>
+            <p>The work is updated when I see and input Information on traffic accidents posted at police stations.</p>
+        </div>
+
+        <div>
+            <span class="legend red"></span>
+            <span class="bold">死者 / Dead</span>
+            <span class="legend gray"></span>
+            <span class="bold">負傷者 / Injured</span>
+        </div>
+    </div>
+    <div id="canvas"></div>
+    <div id="date-label"></div>
+    <input type="checkbox" name="desc-btn" id="desc-btn">
+    <label for="desc-btn" id="desc-btn-label">解説 / Descriptions</label>
+    <div id="detail-desc">
+        <div class="small">
+            <p>1つの円盤が1日を意味する。下に向かうほど過去を意味する。</p>
+            <p>円盤の直径はその日の被害者数に比例する。</p>
+            <p>円盤上に配置された球体は被害者ひとりひとりを意味する。</p>
+            <p>球体の色は被害者の属性(死者/負傷者)を意味する。</p>
+            <p>One disk means one day. Disks at the bottom mean the past.</p>
+            <p>The diameter of the disk is proportional to the number of victims on that day.</p>
+            <p>Spheres placed on the disks mean each victim.</p>
+            <p>The color of the sphere means the attribute of the victim (dead or injured).</p>
+        </div>
+    </div>
+    <div id="copywright">&copy; 2023 tomoya onuki</div>
+</body>
