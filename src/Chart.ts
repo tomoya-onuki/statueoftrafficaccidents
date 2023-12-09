@@ -47,11 +47,18 @@ export class Chart {
     }
 
     public entryData(dataList: string[][]) {
+        function zeroPadding(num: number, len: number): string{
+            return ( Array(len).join('0') + num ).slice( -len );
+        }
+
         dataList.shift();
         this.dataList = dataList.map(data => {
+            let token0 = data[0].replace(/[:\s]/g, '/').split('/');
+            let token1 = token0.map(t => t.length === 1 ? `0${t}` : t);
+            let dateString = `${token1[0]}/${token1[1]}/${token1[2]}T${token1[3]}:${token1[4]}:${token1[5]}+09:00`;
             return {
                 timeStampEpoch: Date.parse(data[0]),
-                dateString: data[0],
+                dateString: dateString,
                 death: Number(data[1]),
                 injury: Number(data[2])
             };
@@ -76,7 +83,8 @@ export class Chart {
         const material = new THREE.MeshBasicMaterial({
             color: color,
             transparent: true,
-            opacity: opacity
+            opacity: opacity,
+            depthTest: false
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(position.x, position.y, position.z);
@@ -93,7 +101,7 @@ export class Chart {
 
     private draw() {
         const radiusFactor = 0.1;
-        const yFactor = -0.00000005;
+        const yFactor = -0.00000002;
         const crntTimeStampEpoch = Date.now();
         let opacity = 0.9;
         const opacityDamingFactor = 0.9;
@@ -112,7 +120,7 @@ export class Chart {
             const bodyElem = <HTMLElement>document.querySelector('#date-label');
             let pos = this.getWindowPosition(mesh);
             let labelElem = document.createElement('span');
-            labelElem.textContent = `${data.dateString.replace(' ', 'T')}+09:00 `;
+            labelElem.textContent = data.dateString;
             labelElem.style.top = `${pos.y}px`
             // labelElem.style.left = `300px`
             bodyElem.appendChild(labelElem);

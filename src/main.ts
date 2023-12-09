@@ -9,14 +9,6 @@ window.addEventListener('load', async () => {
 	chart = new Chart();
 	chart.entryData(data.values);
 	chart.animation();
-	// chart.dump();
-
-	window.addEventListener('resize', () => chart.onResize());
-
-	// const descBtnElm = <HTMLElement>document.querySelector('#desc-btn');
-	// descBtnElm.addEventListener('click', () => {
-	// 	const detailDescElem = <HTMLElement>document.querySelector('#detail-desc');
-	// 	detailDescElem.style.display = 'block';
-	// });
 });
+window.addEventListener('resize', () => chart.onResize());
 
