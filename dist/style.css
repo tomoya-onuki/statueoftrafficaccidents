@@ -9,6 +9,7 @@ body {
     font-family: 'Zen Kaku Gothic New', sans-serif;
     user-select: none;
     color: #555;
+    background-color: #efefef;
 }
 .title {
     font-weight: 600;
@@ -20,10 +21,10 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #efefef;
     z-index: 1;
     text-align: center;
     padding: 30px 0px;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #desc div {

@@ -39,7 +39,7 @@ export class Chart {
         this.controls.minPolarAngle = -Math.PI / 2;
         // ズームの制限
         this.controls.maxDistance = 500;
-        this.controls.minDistance = 150;
+        this.controls.minDistance = 50;
         this.controls.autoRotate = true;
         this.controls.autoRotateSpeed = 2.0;
         this.controls.enablePan = false;
@@ -47,8 +47,8 @@ export class Chart {
     }
 
     public entryData(dataList: string[][]) {
-        function zeroPadding(num: number, len: number): string{
-            return ( Array(len).join('0') + num ).slice( -len );
+        function zeroPadding(num: number, len: number): string {
+            return (Array(len).join('0') + num).slice(-len);
         }
 
         dataList.shift();
@@ -65,7 +65,7 @@ export class Chart {
         }).reverse();
     }
 
-    private genSphere(position: THREE.Vector3, opacity: number, radius: number, color: THREE.Color) {
+    private makeSphereMesh(position: THREE.Vector3, radius: number, opacity: number, color: string) {
         const geometry = new THREE.SphereGeometry(radius, 32, 32);
         const material = new THREE.MeshBasicMaterial({
             color: color,
@@ -75,10 +75,10 @@ export class Chart {
         });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(position.x, position.y, position.z);
-        return mesh;
+        return mesh
     }
 
-    private genCircle(position: THREE.Vector3, opacity: number, radius: number, color: THREE.Color) {
+    private makeCircleMesh(y: number, opacity: number, radius: number, color: string) {
         const geometry = new THREE.CircleGeometry(radius, 32);
         const material = new THREE.MeshBasicMaterial({
             color: color,
@@ -87,16 +87,16 @@ export class Chart {
             depthTest: false
         });
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(position.x, position.y, position.z);
+        mesh.position.set(0, y, 0);
         mesh.rotateX(-Math.PI / 2);
         return mesh;
     }
 
 
-    private calcRandomPosInCircle() {
+    private calcRandomPosInCircle(radius: number) {
         const theta = 2.0 * Math.PI * Math.random();
-        const radius = Math.sqrt(Math.random());
-        return { x: radius * Math.cos(theta), y: radius * Math.sin(theta) };
+        const r = Math.sqrt(Math.random());
+        return { x: radius * r * Math.cos(theta), y: radius * r * Math.sin(theta) };
     }
 
     private draw() {
@@ -104,25 +104,23 @@ export class Chart {
         const yFactor = -0.00000002;
         const crntTimeStampEpoch = Date.now();
         let opacity = 0.9;
-        const opacityDamingFactor = 0.9;
+        const opacityDamingFactor = 0.95;
 
         this.dataList.map((data, idx) => {
             const deathAndInjuryTotal = data.injury + data.death;
-            const radius = deathAndInjuryTotal * radiusFactor;
+            const baseRadius = deathAndInjuryTotal * radiusFactor;
             const y = (crntTimeStampEpoch - data.timeStampEpoch) * yFactor + this.yOffset;
 
             // ベースのサークル
-            let position = new THREE.Vector3(0, y, 0);
-            let mesh = this.genCircle(position, opacity * 0.1, radius, new THREE.Color('#000000'));
-            // mesh.name = `base-${idx}`;
+            let mesh = this.makeCircleMesh(y, opacity * 0.1, baseRadius, '#000000');
             this.scene.add(mesh);
 
+            // 時刻ラベルの作成
             const bodyElem = <HTMLElement>document.querySelector('#date-label');
             let pos = this.getWindowPosition(mesh);
             let labelElem = document.createElement('span');
             labelElem.textContent = data.dateString;
             labelElem.style.top = `${pos.y}px`
-            // labelElem.style.left = `300px`
             bodyElem.appendChild(labelElem);
 
             this.baseList.push({
@@ -132,23 +130,17 @@ export class Chart {
 
             // 個々のサークル
             for (let i = 0; i < data.death; i++) {
-                let randomPos = this.calcRandomPosInCircle();
-                let x = randomPos.x * radius;
-                let z = randomPos.y * radius;
-
-                position = new THREE.Vector3(x, y, z);
-                let mesh = this.genSphere(position, opacity, 2.0, new THREE.Color('#D93A49'));
-                // mesh.name = `death-${idx}`;
+                let randomPos = this.calcRandomPosInCircle(baseRadius);
+                // let x = randomPos.x * baseRadius;/
+                // let z = randomPos.y * baseRadius;
+                let position = new THREE.Vector3(randomPos.x, y, randomPos.y);
+                let mesh = this.makeSphereMesh(position, 2, opacity, '#D93A49');
                 this.scene.add(mesh);
             }
             for (let i = 0; i < data.injury; i++) {
-                let randomPos = this.calcRandomPosInCircle();
-                let x = randomPos.x * radius;
-                let z = randomPos.y * radius;
-
-                position = new THREE.Vector3(x, y, z);
-                let mesh = this.genSphere(position, opacity, 0.5, new THREE.Color('#555555'));
-                // mesh.name = `injury-${idx}`;
+                let randomPos = this.calcRandomPosInCircle(baseRadius);
+                let position = new THREE.Vector3(randomPos.x, y, randomPos.y);
+                let mesh = this.makeSphereMesh(position, 0.5, opacity, '#555555');
                 this.scene.add(mesh);
             }
 
@@ -156,12 +148,32 @@ export class Chart {
         });
     }
 
+
+
     private update() {
+        const DATE_LABEL_POS_VARIABLE_THRESHOLD: number = 145;
+        const DESCRIPTION_OPACITY_VARIABLE_THRESHOLD: number = 85;
+        const LABEL_X: number = 100;
+        let objDistance: number = this.controls.getDistance();
+
+        // 拡大したときにある拡大率からは時刻ラベルのx座標を可変とする
+        let labelX: number = LABEL_X;
+        if (objDistance < DATE_LABEL_POS_VARIABLE_THRESHOLD) {
+            labelX = Math.pow(DATE_LABEL_POS_VARIABLE_THRESHOLD - objDistance, 2) / 50 + LABEL_X;
+        }
         this.baseList.forEach(base => {
             let pos = this.getWindowPosition(base.mesh);
-            base.elem.style.top = `${pos.y}px`
-            // base.elem.style.left = `${pos.x}px`
+            base.elem.style.top = `${pos.y}px`;
+            base.elem.style.left = `calc(50vw + ${labelX}px)`;
         });
+
+        // 拡大したときにある拡大率からは説明文を不透明にする
+        const descriptionElem: HTMLElement = <HTMLElement>document.querySelector('#desc');
+        let descOpacity: number = 1.0;
+        if (objDistance < DESCRIPTION_OPACITY_VARIABLE_THRESHOLD) {
+            descOpacity = (objDistance -this.controls.minDistance)  / (DESCRIPTION_OPACITY_VARIABLE_THRESHOLD - this.controls.minDistance);
+        }
+        descriptionElem.style.opacity = String(descOpacity);
     }
 
     public animation() {
@@ -195,15 +207,15 @@ export class Chart {
 
     public onResize() {
         // サイズを取得
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        this.width = window.innerWidth;
+        // const height = window.innerHeight;
 
         // レンダラーのサイズを調整する
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(width, height);
+        this.renderer.setSize(this.width, this.height);
 
         // カメラのアスペクト比を正す
-        this.camera.aspect = width / height;
+        this.camera.aspect = this.width / this.height;
         this.camera.updateProjectionMatrix();
     }
 }
