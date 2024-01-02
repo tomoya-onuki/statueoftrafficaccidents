@@ -69,9 +69,9 @@ export class Chart {
     private draw() {
         // this.dataList = [this.dataList[0]];
         this.dataList.map((data, idx) => {
-            let dailyDisc = new DailyDisc(data, this.yOffset, this.camera, this.width, this.height);
+            let dailyDisc = new DailyDisc(data, this.yOffset);
+            dailyDisc.initDateTimeLabelElemPosition(this.windowPositionFrom(dailyDisc.wordPosition));
             this.dailyDiscList.push(dailyDisc);
-
             this.scene = dailyDisc.draw(this.scene);
         });
     }
@@ -96,11 +96,11 @@ export class Chart {
 
         const tick = () => {
             this.controls.update();
-
             this.updateDescriptionOpacity();
 
+            let obj2cameraDistance: number = this.controls.getDistance();
             this.dailyDiscList.forEach((dailyDisc: DailyDisc) => {
-                dailyDisc.updateLabelPosition(this.camera, this.width, this.height, this.controls);
+                dailyDisc.updateDateTimeLabelElemPosition(this.windowPositionFrom(dailyDisc.wordPosition), obj2cameraDistance);
                 dailyDisc.updateSpherePosition();
             });
 
@@ -112,6 +112,16 @@ export class Chart {
 
     public dump() {
         console.table(this.dataList);
+    }
+
+    private windowPositionFrom(meshWorldPosition: THREE.Vector3): THREE.Vector2 {
+        // スクリーン座標を取得する
+        const projection = meshWorldPosition.project(this.camera);
+        const sx = (this.width / 2) * (+projection.x + 1.0) * -1;
+        const sy = (this.height / 2) * (-projection.y + 1.0);
+
+        // スクリーン座標
+        return new THREE.Vector2(sx, sy);
     }
 
     public onResize() {

@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { Data } from "./Data";
 import { DeathHumanSphere } from "./DeathHumanSphere";
 import { InjuryHumanSphere } from "./InjuryHumanSphere";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { HumanSphere } from "./HumanSphere";
 
 export class DailyDisc {
@@ -13,7 +12,7 @@ export class DailyDisc {
     private mesh: THREE.Mesh;
     private labelElem: HTMLElement;
 
-    constructor(data: Data, yOffset: number, camera: THREE.Camera, width: number, height: number) {
+    constructor(data: Data, yOffset: number) {
         const RADIUS_FACTOR: number = 0.1;
         const Y_FACTOR: number = -0.00000002;
         const BASE_OPACITY: number = 0.9;
@@ -31,7 +30,8 @@ export class DailyDisc {
 
         // 時刻ラベルの作成
         const bodyElem = <HTMLElement>document.querySelector('#date-label');
-        this.labelElem = this.initDateTimeLabelElem(data, camera, width, height);
+        this.labelElem = document.createElement('span');
+        this.labelElem.textContent = data.dateString;
         bodyElem.appendChild(this.labelElem);
 
         for (let i = 0; i < data.death; i++) {
@@ -43,13 +43,7 @@ export class DailyDisc {
         }
     }
 
-    private initDateTimeLabelElem(data: Data, camera: THREE.Camera, width: number, height: number): HTMLElement {
-        let pos = this.getWindowPosition(camera, width, height);
-        let labelElem = document.createElement('span');
-        labelElem.textContent = data.dateString;
-        labelElem.style.top = `${pos.y}px`
-        return labelElem;
-    }
+    
 
     private makeCircleMesh() {
         const geometry = new THREE.CircleGeometry(this.radius, 64);
@@ -65,7 +59,7 @@ export class DailyDisc {
         return mesh;
     }
 
-    private calcRandomPosInCircle(offsetRadius: number): THREE.Vector3 {
+    private calcRandomPosInDailyDisc(offsetRadius: number): THREE.Vector3 {
         const theta = 2.0 * Math.PI * Math.random();
         const r = Math.sqrt(Math.random());
         return new THREE.Vector3(
@@ -80,7 +74,7 @@ export class DailyDisc {
         scene.add(this.mesh);
 
         this.humanSphereList.forEach(humanSphere => {
-            let position = this.calcRandomPosInCircle(humanSphere.radius);
+            let position = this.calcRandomPosInDailyDisc(humanSphere.radius);
             let mesh = humanSphere.makeMesh(position, this.opacity);
             scene.add(mesh);
         });
@@ -88,26 +82,29 @@ export class DailyDisc {
         return scene;
     }
 
+    public initDateTimeLabelElemPosition(widowPosition: THREE.Vector2) {
+        this.labelElem.style.top = `${widowPosition.y}px`
+    }
 
-    public updateLabelPosition(camera: THREE.Camera, width: number, height: number, controls: OrbitControls) {
+    public updateDateTimeLabelElemPosition(windowPosition: THREE.Vector2, obj2cameraDistance: number) {
         const DATE_LABEL_POS_VARIABLE_THRESHOLD: number = 145;
         const LABEL_X: number = 100;
-        let objDistance: number = controls.getDistance();
 
         // 拡大したときにある拡大率からは時刻ラベルのx座標を可変とする
         let labelX: number = LABEL_X;
-        if (objDistance < DATE_LABEL_POS_VARIABLE_THRESHOLD) {
-            labelX = Math.pow(DATE_LABEL_POS_VARIABLE_THRESHOLD - objDistance, 2) / 50 + LABEL_X;
+        if (obj2cameraDistance < DATE_LABEL_POS_VARIABLE_THRESHOLD) {
+            labelX = Math.pow(DATE_LABEL_POS_VARIABLE_THRESHOLD - obj2cameraDistance, 2) / 50 + LABEL_X;
         }
 
-        let pos = this.getWindowPosition(camera, width, height);
-        this.labelElem.style.top = `${pos.y}px`;
+        this.labelElem.style.top = `${windowPosition.y}px`;
         this.labelElem.style.left = `calc(50vw + ${labelX}px)`;
     }
 
     public updateSpherePosition() {
         this.humanSphereList.forEach((humanSphere: HumanSphere) => {
-            humanSphere.updatePosition(this.isCollideFromSphere(humanSphere));
+            const isCollistion: boolean = this.isCollideFromSphere(humanSphere);
+            humanSphere.updatePosition(isCollistion);
+            
         });
     }
 
@@ -117,15 +114,8 @@ export class DailyDisc {
         return distanceCenter + targetSphere.radius >= this.radius;
     }
 
-    private getWindowPosition(camera: THREE.Camera, width: number, height: number) {
-        // 3Dオブジェクトのワールド座標を取得する
-        const worldPosition = this.mesh.getWorldPosition(new THREE.Vector3());
-        // スクリーン座標を取得する
-        const projection = worldPosition.project(camera);
-        const sx = (width / 2) * (+projection.x + 1.0) * -1;
-        const sy = (height / 2) * (-projection.y + 1.0);
-
-        // スクリーン座標
-        return { x: sx, y: sy }
+    public get wordPosition(): THREE.Vector3 {
+        return this.mesh.getWorldPosition(new THREE.Vector3());
     }
+    
 }

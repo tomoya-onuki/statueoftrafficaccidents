@@ -35,6 +35,7 @@ export class HumanSphere {
         }
         this.mesh.position.add(this.velocity);
     }
+  
 
     public get position(): THREE.Vector3 {
         return this.mesh.position;
