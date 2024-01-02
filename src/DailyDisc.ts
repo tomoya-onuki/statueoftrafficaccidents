@@ -104,7 +104,7 @@ export class DailyDisc {
         this.humanSphereList.forEach((humanSphere: HumanSphere) => {
             const isCollistion: boolean = this.isCollideFromSphere(humanSphere);
             humanSphere.updatePosition(isCollistion);
-            
+            humanSphere.updateColor(isCollistion);
         });
     }
 

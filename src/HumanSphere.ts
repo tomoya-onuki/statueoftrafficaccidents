@@ -35,7 +35,14 @@ export class HumanSphere {
         }
         this.mesh.position.add(this.velocity);
     }
-  
+    public updateColor(isCollistion: boolean) {
+        const material:THREE.MeshBasicMaterial = <THREE.MeshBasicMaterial>this.mesh.material;
+        if(isCollistion) {
+            material.color.set("#00ffff");
+        } else {
+            material.color.set(this.color);
+        }
+    }
 
     public get position(): THREE.Vector3 {
         return this.mesh.position;
