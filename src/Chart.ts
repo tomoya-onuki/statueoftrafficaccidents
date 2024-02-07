@@ -11,7 +11,7 @@ export class Chart {
     private controls: OrbitControls;
     private width: number;
     private height: number;
-    private yOffset: number = 20;
+    private yOffset: number = 30;
     private dailyDiscList: DailyDisc[] = [];
 
     constructor() {
@@ -79,7 +79,7 @@ export class Chart {
 
 
     private updateDescriptionOpacity() {
-        const DESCRIPTION_OPACITY_VARIABLE_THRESHOLD: number = 85;
+        const DESCRIPTION_OPACITY_VARIABLE_THRESHOLD: number = 150;
         let objDistance: number = this.controls.getDistance();
 
         // 拡大したときにある拡大率からは説明文を不透明にする
