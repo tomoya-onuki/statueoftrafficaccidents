@@ -9,6 +9,7 @@ window.addEventListener('load', async () => {
 	chart = new Chart();
 	chart.entryData(data.values);
 	chart.animation();
+	chart.dump();
 });
 window.addEventListener('resize', () => chart.onResize());
 

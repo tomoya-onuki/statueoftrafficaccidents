@@ -5,6 +5,7 @@ export class HumanSphere {
     private velocity: THREE.Vector3;
     protected _radius: number;
     protected color: string;
+    
 
     constructor() {
         this._radius = 1.0;
@@ -36,12 +37,6 @@ export class HumanSphere {
         this.mesh.position.add(this.velocity);
     }
     public updateColor(isCollistion: boolean) {
-        const material:THREE.MeshBasicMaterial = <THREE.MeshBasicMaterial>this.mesh.material;
-        if(isCollistion) {
-            material.color.set("#00ffff");
-        } else {
-            material.color.set(this.color);
-        }
     }
 
     public get position(): THREE.Vector3 {
@@ -50,6 +45,10 @@ export class HumanSphere {
 
     public get radius(): number {
         return this._radius;
+    }
+
+    protected get material(): THREE.MeshBasicMaterial {
+        return <THREE.MeshBasicMaterial>this.mesh.material;
     }
 
     public isCollideTo(targetSphere: HumanSphere): boolean {

@@ -16,7 +16,7 @@ export class DailyDisc {
         const RADIUS_FACTOR: number = 0.1;
         const Y_FACTOR: number = -0.00000002;
         const BASE_OPACITY: number = 0.9;
-        const OPACITY_DAMPING_FACTOR: number = 0.0000000002;
+        const OPACITY_DAMPING_FACTOR: number = 0.00000000009;
 
         const crntTimeStampEpoch: number = Date.now();
         const deathAndInjuryTotal: number = data.injury + data.death;
