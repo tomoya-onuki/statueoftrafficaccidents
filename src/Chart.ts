@@ -45,6 +45,11 @@ export class Chart {
         this.controls.autoRotateSpeed = 0.5;
         this.controls.enablePan = false;
         // console.log(this.controls.getDistance())
+
+        // const light0 = new THREE.PointLight(0xFFFFFF, 2, 50, 1.0);
+        // this.scene.add(light0);
+        // const light1 = new THREE.AmbientLight(0xFFFFFF, 1.0);
+        // this.scene.add(light1);
     }
 
     public entryData(dataList: string[][]) {
@@ -102,6 +107,7 @@ export class Chart {
             this.dailyDiscList.forEach((dailyDisc: DailyDisc) => {
                 dailyDisc.updateDateTimeLabelElemPosition(this.windowPositionFrom(dailyDisc.wordPosition), obj2cameraDistance);
                 dailyDisc.updateSpherePosition();
+                dailyDisc.rotateArc();
             });
 
             this.renderer.render(this.scene, this.camera);

@@ -11,6 +11,7 @@ export class DailyDisc {
     private position: THREE.Vector3;
     private mesh: THREE.Mesh;
     private labelElem: HTMLElement;
+    private rotateArcSpeed = Math.random() * 0.1;
 
     constructor(data: Data, yOffset: number) {
         const RADIUS_FACTOR: number = 0.1;
@@ -26,7 +27,8 @@ export class DailyDisc {
         const y = (crntTimeStampEpoch - data.timeStampEpoch) * Y_FACTOR + yOffset;
         this.position = new THREE.Vector3(0, y, 0);
 
-        this.mesh = this.makeCircleMesh();
+        // this.mesh = this.makeCircleMesh();
+        this.mesh = this.makeTorusMesh();
 
         // 時刻ラベルの作成
         const bodyElem = <HTMLElement>document.querySelector('#date-label');
@@ -48,7 +50,7 @@ export class DailyDisc {
     private makeCircleMesh() {
         const geometry = new THREE.CircleGeometry(this.radius, 64);
         const material = new THREE.MeshBasicMaterial({
-            color: '#000000',
+            color: '#555555',
             transparent: true,
             opacity: this.opacity * 0.1,
             depthTest: false
@@ -56,6 +58,22 @@ export class DailyDisc {
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.copy(this.position);
         mesh.rotateX(-Math.PI / 2);
+        return mesh;
+    }
+
+    private makeTorusMesh() {
+        let arc: number = Math.random() * 2 + 2;
+        const geometry = new THREE.TorusGeometry(this.radius * 1.1, 0.05, 12, 64, arc);
+        const material = new THREE.MeshBasicMaterial({
+            color: '#555555',
+            transparent: true,
+            opacity: this.opacity * 0.8,
+            depthTest: false
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.copy(this.position);
+        mesh.rotateX(-Math.PI / 2);
+        mesh.rotateZ(Math.PI / Math.random() * 2);
         return mesh;
     }
 
@@ -69,6 +87,11 @@ export class DailyDisc {
         );
     }
 
+    public rotateArc() {
+        this.mesh.rotation.z += this.rotateArcSpeed;
+        // let rad = this.mesh.rotation.z;
+        // this.mesh.rotateZ(rad += Math.PI / 12);
+    }
 
     public draw(scene: THREE.Scene) {
         scene.add(this.mesh);
