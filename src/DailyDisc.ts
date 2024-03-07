@@ -11,18 +11,19 @@ export class DailyDisc {
     private position: THREE.Vector3;
     private mesh: THREE.Mesh;
     private labelElem: HTMLElement;
-    private rotateArcSpeed = Math.random() * 0.1;
+    private rotateArcSpeed: number;
 
     constructor(data: Data, yOffset: number) {
         const RADIUS_FACTOR: number = 0.1;
         const Y_FACTOR: number = -0.00000002;
-        const BASE_OPACITY: number = 0.9;
+        const BASE_OPACITY: number = 0.8;
         const OPACITY_DAMPING_FACTOR: number = 0.0000000001;
 
         const crntTimeStampEpoch: number = Date.now();
         const deathAndInjuryTotal: number = data.injury + data.death;
         this.radius = deathAndInjuryTotal * RADIUS_FACTOR;
         this.opacity = BASE_OPACITY - (crntTimeStampEpoch - data.timeStampEpoch) * OPACITY_DAMPING_FACTOR;
+        this.rotateArcSpeed = deathAndInjuryTotal * 0.0001;
 
         const y = (crntTimeStampEpoch - data.timeStampEpoch) * Y_FACTOR + yOffset;
         this.position = new THREE.Vector3(0, y, 0);
@@ -63,7 +64,7 @@ export class DailyDisc {
 
     private makeTorusMesh() {
         let arc: number = Math.random() * 2 + 2;
-        const geometry = new THREE.TorusGeometry(this.radius * 1.1, 0.05, 12, 64, arc);
+        const geometry = new THREE.TorusGeometry(this.radius * 1.1, 0.1, 12, 64, arc);
         const material = new THREE.MeshBasicMaterial({
             color: '#555555',
             transparent: true,
