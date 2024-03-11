@@ -1,14 +1,14 @@
 import * as THREE from "three";
 
 export class HumanSphere {
-    private mesh: THREE.Mesh = new THREE.Mesh();
+    protected mesh: THREE.Mesh = new THREE.Mesh();
     private velocity: THREE.Vector3;
-    protected _radius: number;
     protected color: string;
+    protected _radius: number;
     
 
     constructor() {
-        this._radius = 1.0;
+        this._radius = 0.4;
         this.color = '#000000'
         this.velocity = new THREE.Vector3(
             (Math.random() - 0.5) * 0.02,

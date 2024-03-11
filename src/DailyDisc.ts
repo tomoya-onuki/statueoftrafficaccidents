@@ -9,27 +9,31 @@ export class DailyDisc {
     private opacity: number;
     private radius: number;
     private position: THREE.Vector3;
-    private mesh: THREE.Mesh;
+    private torusMesh: THREE.Mesh;
+    private sphearMeshGroup: THREE.Group;
     private labelElem: HTMLElement;
     private rotateArcSpeed: number;
+    private rotateArcRadian: number;
 
-    constructor(data: Data, yOffset: number) {
+    constructor(data: Data, yOffset: number, opacity: number) {
         const RADIUS_FACTOR: number = 0.1;
         const Y_FACTOR: number = -0.00000002;
-        const BASE_OPACITY: number = 0.8;
-        const OPACITY_DAMPING_FACTOR: number = 0.0000000001;
 
         const crntTimeStampEpoch: number = Date.now();
         const deathAndInjuryTotal: number = data.injury + data.death;
         this.radius = deathAndInjuryTotal * RADIUS_FACTOR;
-        this.opacity = BASE_OPACITY - (crntTimeStampEpoch - data.timeStampEpoch) * OPACITY_DAMPING_FACTOR;
-        this.rotateArcSpeed = deathAndInjuryTotal * 0.0001;
+        this.opacity = opacity;
+
+        // this.rotateArcSpeed = deathAndInjuryTotal * 0.0001;
+        this.rotateArcSpeed = Math.pow(deathAndInjuryTotal, 2) * 0.000001;
+        this.rotateArcRadian = deathAndInjuryTotal / 50;
 
         const y = (crntTimeStampEpoch - data.timeStampEpoch) * Y_FACTOR + yOffset;
         this.position = new THREE.Vector3(0, y, 0);
 
         // this.mesh = this.makeCircleMesh();
-        this.mesh = this.makeTorusMesh();
+        this.torusMesh = this.makeTorusMesh();
+        this.sphearMeshGroup = new THREE.Group();
 
         // 時刻ラベルの作成
         const bodyElem = <HTMLElement>document.querySelector('#date-label');
@@ -46,27 +50,14 @@ export class DailyDisc {
         }
     }
 
-    
 
-    private makeCircleMesh() {
-        const geometry = new THREE.CircleGeometry(this.radius, 64);
-        const material = new THREE.MeshBasicMaterial({
-            color: '#555555',
-            transparent: true,
-            opacity: this.opacity * 0.1,
-            depthTest: false
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.copy(this.position);
-        mesh.rotateX(-Math.PI / 2);
-        return mesh;
-    }
 
     private makeTorusMesh() {
-        let arc: number = Math.random() * 2 + 2;
+        let arc: number = this.rotateArcRadian;
+        // let arc: number = Math.random() * 2 + 2;
         const geometry = new THREE.TorusGeometry(this.radius * 1.1, 0.1, 12, 64, arc);
         const material = new THREE.MeshBasicMaterial({
-            color: '#555555',
+            color: '#999',
             transparent: true,
             opacity: this.opacity * 0.8,
             depthTest: false
@@ -89,19 +80,21 @@ export class DailyDisc {
     }
 
     public rotateArc() {
-        this.mesh.rotation.z += this.rotateArcSpeed;
+        this.torusMesh.rotation.z += this.rotateArcSpeed;
         // let rad = this.mesh.rotation.z;
         // this.mesh.rotateZ(rad += Math.PI / 12);
     }
 
     public draw(scene: THREE.Scene) {
-        scene.add(this.mesh);
+        scene.add(this.torusMesh);
 
         this.humanSphereList.forEach(humanSphere => {
             let position = this.calcRandomPosInDailyDisc(humanSphere.radius);
             let mesh = humanSphere.makeMesh(position, this.opacity);
-            scene.add(mesh);
+            // scene.add(mesh);
+            this.sphearMeshGroup.add(mesh);
         });
+        scene.add(this.sphearMeshGroup);
 
         return scene;
     }
@@ -125,11 +118,12 @@ export class DailyDisc {
     }
 
     public updateSpherePosition() {
-        this.humanSphereList.forEach((humanSphere: HumanSphere) => {
-            const isCollistion: boolean = this.isCollideFromSphere(humanSphere);
-            humanSphere.updatePosition(isCollistion);
-            humanSphere.updateColor(isCollistion);
-        });
+        // this.humanSphereList.forEach((humanSphere: HumanSphere) => {
+        //     const isCollistion: boolean = this.isCollideFromSphere(humanSphere);
+        //     humanSphere.updatePosition(isCollistion);
+        //     humanSphere.updateColor(isCollistion);
+        // });
+        this.sphearMeshGroup.rotation.y += this.rotateArcSpeed * 0.1;
     }
 
 
@@ -139,7 +133,7 @@ export class DailyDisc {
     }
 
     public get wordPosition(): THREE.Vector3 {
-        return this.mesh.getWorldPosition(new THREE.Vector3());
+        return this.torusMesh.getWorldPosition(new THREE.Vector3());
     }
-    
+
 }

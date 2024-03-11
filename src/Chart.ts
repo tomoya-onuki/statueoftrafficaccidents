@@ -11,7 +11,7 @@ export class Chart {
     private controls: OrbitControls;
     private width: number;
     private height: number;
-    private yOffset: number = 30;
+    private yOffset: number = 25;
     private dailyDiscList: DailyDisc[] = [];
 
     constructor() {
@@ -30,7 +30,8 @@ export class Chart {
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 1, 5000);
-        this.camera.position.set(100, 30 + this.yOffset, 100);
+        this.camera.position.set(160, 0, 0);
+        // this.camera.position.set(100, 30 + this.yOffset, 100);
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
@@ -40,16 +41,10 @@ export class Chart {
         this.controls.minPolarAngle = -Math.PI / 2;
         // ズームの制限
         this.controls.maxDistance = 500;
-        this.controls.minDistance = 50;
+        this.controls.minDistance = 0;
         this.controls.autoRotate = true;
         this.controls.autoRotateSpeed = 0.5;
         this.controls.enablePan = false;
-        // console.log(this.controls.getDistance())
-
-        // const light0 = new THREE.PointLight(0xFFFFFF, 2, 50, 1.0);
-        // this.scene.add(light0);
-        // const light1 = new THREE.AmbientLight(0xFFFFFF, 1.0);
-        // this.scene.add(light1);
     }
 
     public entryData(dataList: string[][]) {
@@ -72,9 +67,9 @@ export class Chart {
     }
 
     private draw() {
-        // this.dataList = [this.dataList[0]];
         this.dataList.map((data, idx) => {
-            let dailyDisc = new DailyDisc(data, this.yOffset);
+            let opacity = (this.dataList.length - idx) / this.dataList.length * 0.7 + 0.2;
+            let dailyDisc = new DailyDisc(data, this.yOffset, opacity);
             dailyDisc.initDateTimeLabelElemPosition(this.windowPositionFrom(dailyDisc.wordPosition));
             this.dailyDiscList.push(dailyDisc);
             this.scene = dailyDisc.draw(this.scene);
@@ -91,7 +86,7 @@ export class Chart {
         const descriptionElem: HTMLElement = <HTMLElement>document.querySelector('#desc');
         let descOpacity: number = 1.0;
         if (objDistance < DESCRIPTION_OPACITY_VARIABLE_THRESHOLD) {
-            descOpacity = (objDistance - this.controls.minDistance) / (DESCRIPTION_OPACITY_VARIABLE_THRESHOLD - this.controls.minDistance);
+            descOpacity = (objDistance - 100) / (DESCRIPTION_OPACITY_VARIABLE_THRESHOLD - 100);
         }
         descriptionElem.style.opacity = String(descOpacity);
     }
