@@ -19,7 +19,7 @@ export class DailyDisc {
         const RADIUS_FACTOR: number = 0.1;
         const Y_FACTOR: number = -0.00000002;
 
-        const crntTimeStampEpoch: number = Date.now();
+        const crntTimeStampEpoch: number = new Date(2024,4,27,3,51).valueOf();
         const deathAndInjuryTotal: number = data.injury + data.death;
         this.radius = deathAndInjuryTotal * RADIUS_FACTOR;
         this.opacity = opacity;

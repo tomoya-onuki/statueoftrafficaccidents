@@ -11,7 +11,7 @@ export class Chart {
     private controls: OrbitControls;
     private width: number;
     private height: number;
-    private yOffset: number = 25;
+    private yOffset: number = 75;
     private dailyDiscList: DailyDisc[] = [];
 
     constructor() {
