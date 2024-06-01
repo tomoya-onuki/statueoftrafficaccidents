@@ -3,7 +3,7 @@ import { CollisionedAnimation } from "./CollisionedAnimation";
 
 export class InjuryHumanSphere extends HumanSphere {
     protected _radius: number = 0.4;
-    protected color: string = '#999';
+    protected color: string = '#777';
     private collisionAnimation: CollisionedAnimation;
 
     constructor() {
