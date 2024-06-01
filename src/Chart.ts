@@ -13,6 +13,8 @@ export class Chart {
     private height: number;
     private yOffset: number = 75;
     private dailyDiscList: DailyDisc[] = [];
+    private startZoomOutAnimation: Boolean = true;
+    private startTiltAnimation: Boolean = true;
 
     constructor() {
         this.renderer = new THREE.WebGLRenderer({
@@ -30,7 +32,7 @@ export class Chart {
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 1, 5000);
-        this.camera.position.set(160, 0, 0);
+        this.camera.position.set(0, 5, 0);
         // this.camera.position.set(100, 30 + this.yOffset, 100);
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -93,7 +95,7 @@ export class Chart {
 
     public animation() {
         this.draw();
-
+        let a = 0;
         const tick = () => {
             this.controls.update();
             this.updateDescriptionOpacity();
@@ -104,6 +106,24 @@ export class Chart {
                 dailyDisc.updateSpherePosition();
                 dailyDisc.rotateArc();
             });
+
+            if (this.startZoomOutAnimation) {
+                let y = this.camera.position.y * 1.01;
+                this.camera.position.setY(y);
+                if (y > 160) {
+                    this.startZoomOutAnimation = false;
+                }
+            }
+            if (!this.startZoomOutAnimation && this.startTiltAnimation) {
+                let factor = Math.sin(a) / 5 + 1;
+                let x = this.camera.position.x * factor;
+                a += Math.PI / 120;
+                this.camera.position.setX(x);
+                if (a >= Math.PI) {
+                    this.startTiltAnimation = false;
+                }
+            }
+            // console.log(this.camera.position);
 
             this.renderer.render(this.scene, this.camera);
             requestAnimationFrame(tick);

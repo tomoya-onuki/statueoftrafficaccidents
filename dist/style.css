@@ -25,6 +25,7 @@ body {
     text-align: center;
     padding: 30px 0px;
     background-color: rgba(0, 0, 0, 0);
+    opacity: 0;
 }
 
 #desc div {
