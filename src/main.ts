@@ -1,13 +1,16 @@
 import { Chart } from "./Chart";
 
-const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${process.env.SHEETS_ID}/values/sheet0?key=${process.env.API_KEY}`;
+const filename = 'data/data.csv';
 
 let chart: Chart;
 window.addEventListener('load', async () => {
-	const responce = await fetch(apiURL);
-	const data = await responce.json();
+	const responce = await fetch(filename);
+	const data: string = await responce.text();
+	const tableData: string[][] = data.split('\n').map((line: string) => {
+		return line.replace('\r', '').split(',');
+	});
 	chart = new Chart();
-	chart.entryData(data.values);
+	chart.entryData(tableData);
 	chart.animation();
 	chart.dump();
 });
