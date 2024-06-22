@@ -55,7 +55,7 @@ export class DailyDisc {
     private makeTorusMesh() {
         let arc: number = this.rotateArcRadian;
         // let arc: number = Math.random() * 2 + 2;
-        const geometry = new THREE.TorusGeometry(this.radius * 1.1, 0.1, 12, 64, arc);
+        const geometry = new THREE.TorusGeometry(this.radius * 1.1, 0.1, 9, 24, arc);
         const material = new THREE.MeshBasicMaterial({
             color: '#999',
             transparent: true,

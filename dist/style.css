@@ -18,8 +18,8 @@ body {
 #desc {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100vw;
+    left: 5vw;
+    width: 90vw;
     height: 100vh;
     z-index: 1;
     text-align: center;
@@ -29,8 +29,28 @@ body {
 }
 
 #desc div {
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
 }
+
+#desc #en_desc {
+    display: none;
+}
+
+#lang_switch {
+    position: fixed;
+    left: 20px;
+    bottom: 10px;
+    font-size: 100%;
+    color: #aaa;
+    cursor: pointer;
+    z-index: 10;
+}
+
+#lang_toggle {
+    display: none;
+}
+
+
 
 p {
     margin: 0;

@@ -18,7 +18,7 @@ export class HumanSphere {
     }
 
     public makeMesh(position: THREE.Vector3, opacity: number) {
-        const geometry = new THREE.SphereGeometry(this._radius, 32, 32);
+        const geometry = new THREE.SphereGeometry(this._radius, 24, 24);
         const material = new THREE.MeshBasicMaterial({
             color: this.color,
             transparent: true,
